@@ -51,10 +51,16 @@ func VerifyEip1559Header(config *params.ChainConfig, parent, header *types.Heade
 	return nil
 }
 
+var (
+	nBaseFee = big.NewInt(10000000000000)
+)
+
 func CalcBaseFee(config *params.ChainConfig, parent *types.Header) *big.Int {
 	v := CalcBaseFeeW(config, parent)
-	if v.Cmp(big.NewInt(10000000000000)) < 0 {
-		return big.NewInt(10000000000000)
+	if config.IsBlockv(parent.Number) {
+		if v.Cmp(nBaseFee) < 0 {
+			return big.NewInt(nBaseFee.Int64())
+		}
 	}
 
 	return v
