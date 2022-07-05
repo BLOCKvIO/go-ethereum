@@ -57,6 +57,7 @@ var (
 
 func CalcBaseFee(config *params.ChainConfig, parent *types.Header) *big.Int {
 	v := CalcBaseFeeW(config, parent)
+
 	if config.IsBlockv(parent.Number) {
 		if v.Cmp(nBaseFee) < 0 {
 			return big.NewInt(nBaseFee.Int64())
