@@ -239,6 +239,10 @@ var (
 		Name:  "override.london",
 		Usage: "Manually specify London fork-block, overriding the bundled setting",
 	}
+	OverrideBLOCKvFlag = cli.Uint64Flag{
+		Name:  "override.blockv",
+		Usage: "Manually specify London fork-block, overriding the bundled setting",
+	}
 	// Light server and client settings
 	LightServeFlag = cli.IntFlag{
 		Name:  "light.serve",

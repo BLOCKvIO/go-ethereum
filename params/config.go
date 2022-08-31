@@ -437,7 +437,7 @@ func (c *ChainConfig) IsLondon(num *big.Int) bool {
 }
 
 func (c *ChainConfig) IsBlockv(num *big.Int) bool {
-	return isForked(big.NewInt(1469730), num)
+	return isForked(c.BlockvBlock, num)
 }
 
 // IsTerminalPoWBlock returns whether the given block is the last block of PoW stage.
