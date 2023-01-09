@@ -17,6 +17,7 @@
 package node
 
 import (
+	"crypto/ecdsa"
 	"errors"
 	"fmt"
 	"net/http"
@@ -149,6 +150,8 @@ func New(conf *Config) (*Node, error) {
 	node.http = newHTTPServer(node.log, conf.HTTPTimeouts)
 	node.ws = newHTTPServer(node.log, rpc.DefaultHTTPTimeouts)
 	node.ipc = newIPCServer(node.log, conf.IPCEndpoint())
+
+	node.server.Config.EnableNodePermission = node.config.EnableNodePermission
 
 	return node, nil
 }
@@ -644,4 +647,54 @@ func (n *Node) closeDatabases() (errors []error) {
 		}
 	}
 	return errors
+}
+
+// delegate call to node.Config
+func (n *Node) IsPermissionEnabled() bool {
+	return n.config.IsPermissionEnabled()
+}
+
+// delegate call to node.Config
+func (n *Node) GetNodeKey() *ecdsa.PrivateKey {
+	return n.config.NodeKey()
+}
+
+// Lifecycle retrieves a currently lifecycle registered of a specific type.
+func (n *Node) Lifecycle(lifecycle interface{}) error {
+	n.lock.Lock()
+	defer n.lock.Unlock()
+
+	// Short circuit if the node's not running
+	if n.server == nil {
+		return ErrNodeStopped
+	}
+	// Otherwise try to find the service to return
+	element := reflect.ValueOf(lifecycle).Elem()
+	for _, runningLifecycle := range n.lifecycles {
+		lElem := reflect.TypeOf(runningLifecycle)
+		if lElem == element.Type() {
+			element.Set(reflect.ValueOf(runningLifecycle))
+			return nil
+		}
+	}
+
+	return ErrServiceUnknown
+}
+
+func (n *Node) GetLifecycle(fn func(lf Lifecycle) bool) error {
+	n.lock.Lock()
+	defer n.lock.Unlock()
+
+	// Short circuit if the node's not running
+	if n.server == nil {
+		return ErrNodeStopped
+	}
+	// Otherwise try to find the service to return
+	for _, runningLifecycle := range n.lifecycles {
+		if ok := fn(runningLifecycle); ok {
+			return nil
+		}
+	}
+
+	return nil
 }

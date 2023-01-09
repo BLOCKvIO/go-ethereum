@@ -39,6 +39,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/permission"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -54,6 +55,7 @@ var (
 	app = flags.NewApp(gitCommit, gitDate, "the go-ethereum command line interface")
 	// flags that configure the node
 	nodeFlags = []cli.Flag{
+		utils.EnableNodePermissionFlag,
 		utils.IdentityFlag,
 		utils.UnlockedAccountFlag,
 		utils.PasswordFileFlag,
@@ -396,6 +398,24 @@ func startNode(ctx *cli.Context, stack *node.Node, backend ethapi.Backend) {
 				}
 			}
 		}()
+	}
+
+	// checking if permissions is enabled and staring the permissions service
+
+	if stack.IsPermissionEnabled() {
+		var permissionService *permission.PermissionCtrl
+		if err := stack.GetLifecycle(func(lf node.Lifecycle) bool {
+			if r, ok := lf.(*permission.PermissionCtrl); ok {
+				permissionService = r
+				return true
+			}
+			return false
+		}); err != nil {
+			utils.Fatalf("Permission service not runnning: %v", err)
+		}
+		if err := permissionService.AfterStart(); err != nil {
+			utils.Fatalf("Permission service post construct failure: %v", err)
+		}
 	}
 
 	// Start auxiliary services if enabled

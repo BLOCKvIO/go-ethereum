@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/eth/protocols/eth"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/permission/core"
 )
 
 const (
@@ -168,6 +169,7 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 	}
 	op := peerToSyncOp(mode, peer)
 	if op.td.Cmp(ourTD) <= 0 {
+		core.SetSyncStatus()
 		return nil // We're in sync.
 	}
 	return op

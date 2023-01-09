@@ -24,11 +24,14 @@ import (
 const (
 	errInvalidMsgCode = iota
 	errInvalidMsg
+
+	errPermissionDenied = iota + 100
 )
 
 var errorToString = map[int]string{
-	errInvalidMsgCode: "invalid message code",
-	errInvalidMsg:     "invalid message",
+	errInvalidMsgCode:   "invalid message code",
+	errInvalidMsg:       "invalid message",
+	errPermissionDenied: "permission denied",
 }
 
 type peerError struct {

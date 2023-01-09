@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -190,6 +191,8 @@ type Config struct {
 
 	// AllowUnprotectedTxs allows non EIP-155 protected transactions to be send over RPC.
 	AllowUnprotectedTxs bool `toml:",omitempty"`
+
+	EnableNodePermission bool `toml:",omitempty"` // comes from EnableNodePermissionFlag --permissioned.
 }
 
 // IPCEndpoint resolves an IPC endpoint based on a configured value, taking into
@@ -485,4 +488,13 @@ func (c *Config) warnOnce(w *bool, format string, args ...interface{}) {
 	}
 	l.Warn(fmt.Sprintf(format, args...))
 	*w = true
+}
+
+func (c *Config) IsPermissionEnabled() bool {
+	fullPath := filepath.Join(c.DataDir, params.PERMISSION_MODEL_CONFIG)
+	if _, err := os.Stat(fullPath); err != nil {
+		log.Warn(fmt.Sprintf("%s file is missing. Smart-contract-based permission service will be disabled", params.PERMISSION_MODEL_CONFIG), "error", err)
+		return false
+	}
+	return true
 }
