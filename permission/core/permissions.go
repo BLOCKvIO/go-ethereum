@@ -2,7 +2,6 @@ package core
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"math/big"
 	"os"
@@ -152,8 +151,6 @@ func CheckAccountPermission(from common.Address, to *common.Address, value *big.
 	} else {
 		toAcct = *to
 	}
-
-	fmt.Println("from ", from)
 
 	return IsTransactionAllowed(from, toAcct, value, gasPrice, big.NewInt(int64(gas)), data, transactionType)
 }
