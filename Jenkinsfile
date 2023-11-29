@@ -18,17 +18,10 @@ pipeline {
       docker { image 'golang:1.19-alpine' }
     }
     stages {
-        stage('prep env') {
-          steps {
-            script {
-              sh 'apk add make'
-            }
-          }
-        }
-        stage('make geth') {
+        stage('build geth') {
             steps {
                 script {
-                    sh 'make geth'
+                    sh 'env GO111MODULE=on go run build/ci.go install ./cmd/geth'
                 }
             }
         }
