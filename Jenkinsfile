@@ -15,9 +15,16 @@ pipeline {
         ansiColor('xterm')
     }
     agent {
-      label 'master'
+      docker { image 'golang:1.19' }
     }
     stages {
+        stage('prep env') {
+          steps {
+            script {
+              sh 'apk add make'
+            }
+          }
+        }
         stage('make geth') {
             steps {
                 script {
