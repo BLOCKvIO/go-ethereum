@@ -14,6 +14,9 @@ pipeline {
         disableConcurrentBuilds()
         ansiColor('xterm')
     }
+    agent {
+      label 'master'
+    }
     stages {
         stage('make geth') {
             steps {
