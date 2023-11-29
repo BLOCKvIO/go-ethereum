@@ -27,11 +27,6 @@ pipeline {
         }
     }
     post {
-        always{
-            script {
-                currentBuild.displayName = "${env.BUILD_NUMBER}: ${APP_NAME}:${VERSION}"
-            }
-        }
         success {
           archiveArtifacts artifacts: 'build/bin/geth', followSymlinks: false
         }
