@@ -15,7 +15,7 @@ pipeline {
         ansiColor('xterm')
     }
     agent {
-      docker { image 'golang:1.19' }
+      docker { image 'golang:1.19-alpine' }
     }
     stages {
         stage('prep env') {
