@@ -72,8 +72,21 @@ func CalcBaseFee(config *params.ChainConfig, parent *types.Header) *big.Int {
 	return v
 }
 
-// CalcBaseFee calculates the basefee of the header.
 func CalcBaseFeeW(config *params.ChainConfig, parent *types.Header) *big.Int {
+	v := calcBaseFeeWM(config, parent)
+	if v.Cmp(nBaseFee) < 0 {
+		return big.NewInt(nBaseFee.Int64())
+	}
+
+	if v.Cmp(mBaseFee) > 0 {
+		return big.NewInt(mBaseFee.Int64())
+	}
+
+	return v
+}
+
+// CalcBaseFee calculates the basefee of the header.
+func calcBaseFeeWM(config *params.ChainConfig, parent *types.Header) *big.Int {
 	// If the current block is the first EIP-1559 block, return the InitialBaseFee.
 	if !config.IsLondon(parent.Number) {
 		return new(big.Int).SetUint64(params.InitialBaseFee)
