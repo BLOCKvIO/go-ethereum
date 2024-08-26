@@ -54,7 +54,16 @@ func VerifyEip1559Header(config *params.ChainConfig, parent, header *types.Heade
 var (
 	nBaseFee = big.NewInt(10000000000000)
 	mBaseFee = big.NewInt(20000000000000)
+
+	topPBNum = big.NewInt(5318970)
 )
+
+func isForked(s, head *big.Int) bool {
+	if s == nil || head == nil {
+		return false
+	}
+	return s.Cmp(head) <= 0
+}
 
 func CalcBaseFee(config *params.ChainConfig, parent *types.Header) *big.Int {
 	v := CalcBaseFeeW(config, parent)
@@ -64,8 +73,10 @@ func CalcBaseFee(config *params.ChainConfig, parent *types.Header) *big.Int {
 			return big.NewInt(nBaseFee.Int64())
 		}
 
-		if v.Cmp(mBaseFee) > 0 {
-			return big.NewInt(mBaseFee.Int64())
+		if isForked(topPBNum, parent.Number) {
+			if v.Cmp(mBaseFee) > 0 {
+				return big.NewInt(mBaseFee.Int64())
+			}
 		}
 	}
 
@@ -74,12 +85,16 @@ func CalcBaseFee(config *params.ChainConfig, parent *types.Header) *big.Int {
 
 func CalcBaseFeeW(config *params.ChainConfig, parent *types.Header) *big.Int {
 	v := calcBaseFeeWM(config, parent)
-	if v.Cmp(nBaseFee) < 0 {
-		return big.NewInt(nBaseFee.Int64())
-	}
+	if config.IsBlockv(parent.Number) {
+		if v.Cmp(nBaseFee) < 0 {
+			return big.NewInt(nBaseFee.Int64())
+		}
 
-	if v.Cmp(mBaseFee) > 0 {
-		return big.NewInt(mBaseFee.Int64())
+		if isForked(topPBNum, parent.Number) {
+			if v.Cmp(mBaseFee) > 0 {
+				return big.NewInt(mBaseFee.Int64())
+			}
+		}
 	}
 
 	return v
