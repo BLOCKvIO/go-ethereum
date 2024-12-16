@@ -37,15 +37,15 @@ pipeline {
       success {
         sh 'echo ok'
           archiveArtifacts artifacts: 'build/bin/geth', followSymlinks: false
-        slackSend color: "00FF00", teamDomain: 'smartmedialabs', tokenCredentialId: 'vl-slack-token' , channel: '#web3_builds', message: "${pipelineParams.appName} - ${VRS}(${env.BRANCH_NAME}) Built successfully (<${env.BUILD_URL}|Open>)"
+        slackSend color: "00FF00", teamDomain: 'smartmedialabs', tokenCredentialId: 'vl-slack-token' , channel: '#web3_builds', message: "geth(${env.BRANCH_NAME}) Built successfully (<${env.BUILD_URL}|Open>)"
       }
       unstable {
         sh 'echo ok'
-        slackSend color: "00FF00", teamDomain: 'smartmedialabs', tokenCredentialId: 'vl-slack-token', channel: '#web3_builds', message: "${pipelineParams.appName} - ${VRS}(${env.BRANCH_NAME}) Built successfully (<${env.BUILD_URL}|Open>)"
+        slackSend color: "00FF00", teamDomain: 'smartmedialabs', tokenCredentialId: 'vl-slack-token', channel: '#web3_builds', message: "geth(${env.BRANCH_NAME}) Built successfully (<${env.BUILD_URL}|Open>)"
       }
       failure {
         sh 'echo error'
-        slackSend color: "FF0000", teamDomain: 'smartmedialabs', tokenCredentialId: 'vl-slack-token', channel: '#web3_builds', message: "${pipelineParams.appName} - ${VRS}(${env.BRANCH_NAME}) - Build failure [${ERROR}] (<${env.BUILD_URL}|Open>)"
+        slackSend color: "FF0000", teamDomain: 'smartmedialabs', tokenCredentialId: 'vl-slack-token', channel: '#web3_builds', message: "geth(${env.BRANCH_NAME}) - Build failure [${ERROR}] (<${env.BUILD_URL}|Open>)"
       }
     }
 }
